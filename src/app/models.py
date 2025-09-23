@@ -15,7 +15,11 @@ from .constants import (
 
 
 class User(PrimaryUUIDMixin, AuditMixin, BaseSQLModel):
-    name: Mapped[str] = mapped_column(types.String(USER_NAME_MAX_LENGTH), nullable=False, unique=True)
+    name: Mapped[str] = mapped_column(
+        types.String(USER_NAME_MAX_LENGTH),
+        nullable=False,
+        unique=True,
+    )
     password: Mapped[str] = mapped_column(types.String(BCRYPT_HASH_LENGTH), nullable=False)
 
 

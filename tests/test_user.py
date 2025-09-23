@@ -70,7 +70,10 @@ async def test_read_my_user(session: AsyncSession, client: AsyncClient):
     user = await create_user(session)
     token = create_token(str(user.id))
 
-    response = await client.get(URL_USERS + '/me', headers={'Authorization': 'Bearer ' + token.access_token})
+    response = await client.get(
+        URL_USERS + '/me',
+        headers={'Authorization': 'Bearer ' + token.access_token},
+    )
     assert response.status_code == 200
     assert UserPublic.model_validate(response.json()) == UserPublic.model_validate(user)
 

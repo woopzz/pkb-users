@@ -26,7 +26,10 @@ async def get_user_by_name(session: SessionDep, name: str):
 def create_token(sub: str):
     claims = {
         'sub': sub,
-        'exp': (dt.datetime.now(dt.timezone.utc) + dt.timedelta(minutes=settings.JWT_LIFETIME_IN_MINUTES)),
+        'exp': (
+            dt.datetime.now(dt.timezone.utc)
+            + dt.timedelta(minutes=settings.JWT_LIFETIME_IN_MINUTES)
+        ),
     }
     access_token = jwt.encode(claims, settings.JWT_SECRET, algorithm=JWT_ALGORITHM)
     return Token(access_token=access_token)
