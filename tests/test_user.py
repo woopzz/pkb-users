@@ -5,8 +5,9 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
+from app.core.security import parse_token
 from app.models import UserPublic
-from app.service import create_token, parse_token
+from app.service import create_token
 
 from .utils import create_user
 
@@ -76,6 +77,16 @@ async def test_read_my_user(session: AsyncSession, client: AsyncClient):
     )
     assert response.status_code == 200
     assert UserPublic.model_validate(response.json()) == UserPublic.model_validate(user)
+
+
+@pytest.mark.asyncio
+async def test_read_my_user_with_nonexistent_user_id(session: AsyncSession, client: AsyncClient):
+    token = create_token(str(uuid.uuid4()))
+    response = await client.get(
+        URL_USERS + '/me',
+        headers={'Authorization': 'Bearer ' + token.access_token},
+    )
+    assert response.status_code == 404
 
 
 @pytest.mark.asyncio

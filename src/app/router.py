@@ -2,7 +2,8 @@ from fastapi import APIRouter, HTTPException
 
 from app.core.db import SessionDep
 from app.core.response import generate_openapi_error_responses
-from app.service import CurrentUserDep, get_password_hash
+from app.core.security import CurrentUserIDDep
+from app.service import get_password_hash
 
 from .models import Credentials, Token, User, UserCreate, UserPublic
 from .service import create_token, get_user_by_name, verify_password
@@ -33,8 +34,12 @@ async def create_user(*, session: SessionDep, user_in: UserCreate):
     responses=generate_openapi_error_responses(set(), add_token_related_errors=True),
     tags=['user'],
 )
-async def read_my_user(*, current_user: CurrentUserDep):
-    return UserPublic.model_validate(current_user)
+async def read_my_user(*, session: SessionDep, current_user_id: CurrentUserIDDep):
+    user = await session.get(User, current_user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail='User not found.')
+
+    return UserPublic.model_validate(user)
 
 
 @router.post(
